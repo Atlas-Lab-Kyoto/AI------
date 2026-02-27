@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一言POP作成ツール</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✨ 一言POP作成ツール ✨</h1>
+            <p>商品名と特徴を入力して、魅力的なキャッチコピーを作成しましょう</p>
+        </header>
+        
+        <main>
+            <section class="input-section">
+                <div class="form-group">
+                    <label for="productName">商品名</label>
+                    <input type="text" id="productName" placeholder="例: フレンドフーズ特製コロッケ">
+                </div>
+                <div class="form-group">
+                    <label for="features">特徴・ウリ（スペース区切りで複数可）</label>
+                    <input type="text" id="features" placeholder="例: サクサク ジューシー 国産牛使用">
+                </div>
+                <button id="generateBtn">キャッチコピーを作成する 🪄</button>
+            </section>
+
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>おすすめキャッチコピー</h2>
+                <div id="loading" class="loading" style="display: none;">AIが考え中... 🤔</div>
+                <div id="results" class="results-grid"></div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

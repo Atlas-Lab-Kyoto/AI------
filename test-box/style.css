@@ -1,0 +1,82 @@
+:root {
+    --bg-color: #1e1e2e;
+    --text-color: #cdd6f4;
+    --primary-color: #f38ba8; /* Catppuccin Red */
+    --secondary-color: #89b4fa; /* Catppuccin Blue */
+    --container-bg: rgba(255, 255, 255, 0.05);
+    --btn-hover: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: var(--container-bg);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+    font-weight: 300;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+.timer-display {
+    font-size: 6rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 1rem 0 2rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    background: var(--btn-hover);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn.start {
+    background-color: var(--primary-color);
+    color: #1e1e2e;
+    font-weight: 600;
+}
+
+.btn.start:hover {
+    box-shadow: 0 0 15px var(--primary-color);
+    background-color: #f38ba8;
+}
