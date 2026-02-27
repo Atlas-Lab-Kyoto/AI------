@@ -9,7 +9,12 @@ st.set_page_config(page_title="ペアリング診断", page_icon="💖")
 st.markdown("""
     <style>
     .stApp { background-color: #ffffff !important; }
-    h1 { color: #313131 !important; font-weight: bold !important; }
+    h1 { 
+        color: #313131 !important; 
+        font-weight: bold !important; 
+        font-size: clamp(1.5rem, 8vw, 2.5rem) !important; /* スマホで文字を小さくする魔法 */
+        white-space: nowrap !important; /* 絶対に改行させない */
+    }
     .stWidgetLabel p { color: #4a4a4a !important; font-weight: bold !important; }
 
     input { 
