@@ -101,8 +101,18 @@ if submitted and food and drink:
     status = st.empty()
     status.markdown('<p class="loading-text">💖 診断中...</p>', unsafe_allow_html=True) 
     
-    prompt = f"あなたは京都の「フレンドフーズ」の熟練コンシェルジュです。挨拶は不要。{food}と{drink}の相性をスコア、理由（文章）、美味しくするコツ（1.2.3...）で教えて。"
-
+    prompt = f"""
+    あなたは京都の「フレンドフーズ」の熟練コンシェルジュです。挨拶は一切不要。
+    {food}と{drink}の相性を以下の構成で出力してください。
+    
+    1行目：相性スコア：◯点
+    
+    【理由】
+    （一連の文章で解説。絶対に箇条書きにしないでください）
+    
+    【美味しくするコツ】
+    （1. 2. 3. ...と必ず番号を振り、各項目を改行してください）
+    """
     try:
         response = model.generate_content(prompt)
         status.empty() 
