@@ -86,7 +86,7 @@ except:
     st.stop()
 
 genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash') # 最新の名前に少し修正しました
+model = genai.GenerativeModel('gemini-3-flash-preview') # 最新の名前に少し修正しました
 
 # --- 4. 入力フォーム ---
 with st.form("pairing_form"):
