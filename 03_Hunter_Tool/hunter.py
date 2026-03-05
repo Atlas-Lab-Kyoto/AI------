@@ -3,23 +3,81 @@ import pandas as pd
 import google.generativeai as genai
 import glob
 import os
+import re
 
-# --- 1. 初期設定 (Secretsから安全に読み込む) ---
+# --- 1. 画面の設定 ---
+st.set_page_config(page_title="名脇役ハンター", page_icon="🔍")
+
+# --- 2. スタイル設定（ペアリング診断と統一） ---
+st.markdown("""
+    <style>
+    .stApp { background-color: #ffffff !important; }
+    h1 { color: #313131 !important; font-weight: bold !important; }
+    .stWidgetLabel p { color: #4a4a4a !important; font-weight: bold !important; }
+
+    /* 入力ボックスの改善 */
+    input { 
+        background-color: #ffffff !important; 
+        color: #000000 !important; 
+        border: 1px solid #d3d3d3 !important; 
+        caret-color: #6a994e !important; 
+        font-size: 1.1rem !important;
+    }
+    input:focus { 
+        border: 2px solid #6a994e !important; 
+        box-shadow: 0 0 5px rgba(106, 153, 78, 0.5) !important; 
+        outline: none !important; 
+    }
+
+    /* 診断ボタン：ペアリング診断と同じ形状、色は緑 */
+    div.stButton > button {
+        background-color: #6a994e !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        height: 3.5rem !important;
+        font-size: 1.2rem !important;
+        font-weight: bold !important;
+    }
+
+    /* 診断結果ボックス */
+    .result-container {
+        background-color: #f7fcf2;
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 8px solid #6a994e;
+        color: #313131 !important;
+        margin-top: 20px;
+    }
+
+    .section-title {
+        font-weight: bold;
+        font-size: 1.3rem;
+        color: #6a994e;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .loading-text { color: #6a994e !important; font-size: 1.2rem !important; font-weight: bold !important; }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- 3. Google AIの設定（Secrets対応） ---
 if "GOOGLE_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 else:
-    st.error("APIキーが設定されていません。StreamlitのSecretsを確認してください。")
+    st.error("APIキーが設定されていません。")
 
-# --- 2. データの読み込み (パス指定を確実に) ---
+# --- 4. データの読み込み ---
 @st.cache_data
 def load_data():
-    # hunter.pyがある場所を基準にCSVを探す設定
     current_dir = os.path.dirname(__file__)
     csv_pattern = os.path.join(current_dir, '*.csv')
     csv_files = glob.glob(csv_pattern)
     
     if not csv_files:
-        st.error(f"CSVが見つかりません。場所: {current_dir}")
+        st.error(f"CSVファイルが見つかりません。")
         return pd.DataFrame()
 
     df_list = []
@@ -28,38 +86,50 @@ def load_data():
             temp_df = pd.read_csv(file, encoding='utf-8-sig')
             df_list.append(temp_df)
         except Exception as e:
-            st.warning(f"{os.path.basename(file)} の読み込み失敗: {e}")
+            st.warning(f"{os.path.basename(file)} の読み込み失敗")
 
     if not df_list: return pd.DataFrame()
-
     df = pd.concat(df_list, ignore_index=True).fillna('')
     
-    # 必要列の作成
-    for col in ['商品名', 'メーカー名', 'カナ名', '規格']:
-        if col not in df.columns: df[col] = ""
-
-    df['search_text'] = df['商品名'] + " " + df['メーカー名'] + " " + df['カナ名']
-    df['display_info'] = df.apply(lambda x: f"【{x['商品名']}】 ({x['メーカー名']} / {x['規格']})", axis=1)
+    # 検索用と表示用の列作成
+    df['search_text'] = df['商品名'].astype(str) + " " + df['メーカー名'].astype(str)
+    df['display_info'] = df.apply(lambda x: f"【{x.get('商品名','')}】 ({x.get('メーカー名','')})", axis=1)
     return df
 
-# --- 3. AI診断 (モデル名を安定版に変更) ---
+# --- 5. AI診断ロジック ---
 def find_partner_with_ai(target_product, all_products_list):
     model = genai.GenerativeModel('gemini-3-flash-preview')
-    prompt = f"熟練コンシェルジュとして、{target_product}に合う相棒をリストから3つ選んで理由と共に教えてください。\nリスト:\n{all_products_list}"
+    prompt = f"フレンドフーズの熟練コンシェルジュとして、{target_product}に最高に合う『名脇役』を3つ選んで理由を添えてください。リスト:\n{all_products_list}"
     response = model.generate_content(prompt)
     return response.text
 
-# --- 4. 画面レイアウト ---
+# --- 6. メイン画面 ---
 st.title("🔍 名脇役ハンター")
 df = load_data()
 
 if not df.empty:
-    search_query = st.text_input("キーワードを入力（パン、メーカー名など）")
+    search_query = st.text_input("探したいキーワードを入力（商品名、メーカー名など）", placeholder="例：食パン")
+
     if search_query:
         results = df[df['search_text'].str.contains(search_query, na=False)]
+
         if not results.empty:
-            selected = st.selectbox("正しい商品を選択：", results['display_info'])
-            if st.button("「相棒」をAIに聞く"):
-                with st.spinner("考え中..."):
-                    sample = df.sample(min(150, len(df)))['display_info'].to_list()
-                    st.markdown(find_partner_with_ai(selected, "\n".join(sample)))
+            selected_display = st.selectbox("正しい商品を選択してください：", results['display_info'])
+            
+            if st.button("この商品の「相棒」をAIに聞く"):
+                status = st.empty()
+                status.markdown('<p class="loading-text">🔍 最高の相棒を探索中...</p>', unsafe_allow_html=True)
+                
+                # サンプルから相棒候補を抽出
+                sample_list = df.sample(min(100, len(df)))['display_info'].to_list()
+                answer = find_partner_with_ai(selected_display, "\n".join(sample_list))
+                
+                status.empty()
+                st.markdown(f"""
+                    <div class="result-container">
+                        <span class="section-title">✨ コンシェルジュからの提案</span>
+                        <div style="line-height:1.7;">{answer}</div>
+                    </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.warning("該当する商品が見つかりませんでした。")
