@@ -92,7 +92,7 @@ def find_partner_with_ai(target_product, all_products_list):
 # 4. Streamlit 画面レイアウト
 # ==========================================
 st.set_page_config(page_title="名脇役ハンター", page_icon="🔍")
-st.title("🔍 名脇役ハンター (複数CSV対応版)")
+st.title("🔍 名脇役ハンター")
 st.caption("フォルダ内のすべてのCSVから、最高の一品を見つけ出します。")
 
 df = load_data()
