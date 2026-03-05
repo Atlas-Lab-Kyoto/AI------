@@ -98,8 +98,35 @@ def load_data():
 
 # --- 5. AI診断ロジック ---
 def find_partner_with_ai(target_product, all_products_list):
-    model = genai.GenerativeModel('gemini-3-flash-preview')
-    prompt = f"フレンドフーズの熟練コンシェルジュとして、{target_product}に最高に合う『名脇役』を3つ選んで理由を添えてください。リスト:\n{all_products_list}"
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    prompt = f"""
+    あなたは京都の高級スーパー「フレンドフーズ」の熟練コンシェルジュです。
+    お客様が選んだ【メイン商品】に対して、最高に相性の良い「名脇役」を、リストの中から3つ厳選してください。
+
+    【メイン商品】: {target_product}
+    【商品リスト】: {all_products_list}
+
+    【重要：回答形式】
+    以下の形式を厳守し、各項目の間には必ず空行を入れてください。
+    理由のタイトル（キャッチコピー）と、その後の詳細な説明文の間は必ず改行してください。
+
+    ### 1. **[商品名]**
+    **選んだ理由：[ここに短いキャッチコピー]**
+    
+    [ここから詳細な説明文を詳しく書く。コンシェルジュらしい丁寧な口調で。]
+
+    ### 2. **[商品名]**
+    **選んだ理由：[ここに短いキャッチコピー]**
+    
+    [詳細な説明文]
+
+    ### 3. **[商品名]**
+    **選んだ理由：[ここに短いキャッチコピー]**
+    
+    [詳細な説明文]
+    """
+    
     response = model.generate_content(prompt)
     return response.text
 
