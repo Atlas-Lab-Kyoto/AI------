@@ -98,7 +98,7 @@ def load_data():
 
 # --- 5. AI診断ロジック ---
 def find_partner_with_ai(target_product, all_products_list):
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-3-flash-preview')
     
     prompt = f"""
     あなたは京都の高級スーパー「フレンドフーズ」の熟練コンシェルジュです。
